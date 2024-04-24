@@ -5,7 +5,9 @@ import matplotlib.pyplot as plt
 a = 4
 
 # User input for 'b'
-b = float(input("Please enter a value for b: "))
+b = float(input("Please enter a value for b: ")) # b is the slope of the exponential function
+
+# b is the slope of the exponential function
 
 # Generating the dataset
 n = 100  # Number of observations
