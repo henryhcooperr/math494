@@ -16,21 +16,23 @@ def save_features_to_file(features, labels, filenames, file_path):
 
 
 @count_function_calls
-def load_features_from_file(file_path):
-    """
-    Load features, labels, and filenames from a file.
-    """
-    features = []
-    labels = []
+def load_features_from_file(feature_file):
     filenames = []
-    with open(file_path, 'r') as f:
-        for line in f:
-            parts = line.strip().split(',')
-            filenames.append(parts[0])
-            labels.append(int(parts[1]))
-            feature = list(map(float, parts[2].split()))
-            features.append(feature)
-    return features, labels, filenames
+    labels = []
+    features = []
+    with open(feature_file, 'r') as file:
+        for line in file:
+            parts = line.strip().split(',')  # Assuming comma is the delimiter
+            if len(parts) > 2:
+                filenames.append(parts[0])
+                labels.append(int(parts[1]))
 
-
+                try:
+                    feature_list = parts[2].split()  # Splitting the feature string into individual numbers
+                    features.append([float(x) for x in feature_list])
+                except ValueError as e:
+                    print("Error converting string to float:", e)
+                    print("Offending data:", parts[2])
+    print(labels)
+    return filenames, labels, np.array(features)
 

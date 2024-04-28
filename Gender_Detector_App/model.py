@@ -20,8 +20,7 @@ def train_decision_tree(X, y, filenames):
         X, y, filenames, test_size=0.2, random_state=42)
     model = DecisionTreeClassifier(random_state=42)
     model.fit(X_train, y_train)
-    evaluate_model(model, X_test, y_test, filenames_test) 
-    return model
+    return model, X_test, y_test
 
 @count_function_calls
 def train_random_forest(X, y, filenames):
@@ -44,31 +43,40 @@ def train_random_forest(X, y, filenames):
 from sklearn.metrics import accuracy_score, precision_score, recall_score
 
 @count_function_calls
-def evaluate_model(model, X_test, y_test, filenames_test):
-    print("Filenames Test:" + str(filenames_test))
-    
-    # Ensure that y_test and predictions are of type int, as expected by precision and recall functions
-    y_test = [1 if y == 'female' else 0 for y in y_test]
-    predictions = model.predict(X_test)
 
+def evaluate_model(model, X_test, y_test, filenames_test):
+    print("Evaluating model...")
+
+    # Print the filenames to check what is being tested
+    print("Filenames for Testing:", filenames_test)
     
+    # Debug: Output the actual labels before any changes for tracing issues
+    print("Original Y Test:", y_test)
+
+    # Check if y_test needs conversion from labels ('female', 'male') to integers (1, 0)
+    # If y_test is already integer, remove the conversion; otherwise, uncomment the next line
+    # y_test = [1 if y == 'female' else 0 for y in y_test]
+
+    # Predict using the model
+    print("model", model)
+    predictions = model[0].predict(X_test)
+
     # Compute evaluation metrics
     accuracy = accuracy_score(y_test, predictions)
-    precision = precision_score(y_test, predictions, average='macro')  # Changed to 'macro' for overall average
-    recall = recall_score(y_test, predictions, average='macro')  # Changed to 'macro' for overall average
+    precision = precision_score(y_test, predictions, average='macro')  # 'macro' gives unweighted mean per class
+    recall = recall_score(y_test, predictions, average='macro')
 
     # Print evaluation metrics
     print("Accuracy:", accuracy)
     print("Precision per class:", precision)
     print("Recall per class:", recall)
 
-    # Print predictions against actuals for each file
+    # Print predictions against actual labels for each file
     for filename, actual, predicted in zip(filenames_test, y_test, predictions):
-        print(actual)
-        print(predicted)
         actual_label = 'Female' if actual == 1 else 'Male'
         predicted_label = 'Female' if predicted == 1 else 'Male'
         print(f"File: {filename}, Actual: {actual_label}, Predicted: {predicted_label}")
+
 
 @count_function_calls
 def save_model(model, filename):

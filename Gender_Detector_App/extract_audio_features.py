@@ -22,7 +22,7 @@ def get_audio_files(audio_directory_path, test_size=5):
     
     train_files, test_files, train_labels, test_labels = train_test_split(audio_files, labels, test_size=test_size, random_state=42)
     
-    print(train_labels)
+
     return train_files, train_labels, test_files, test_labels
 
 @count_function_calls
@@ -52,6 +52,7 @@ def extract_features(audio, sr, n_mfcc=13):
 @count_function_calls
 def process_files(audio_files, labels, file_limit=None):
     """Process specified audio files to extract features along with their labels and filenames."""
+    
     features_list = []
     filenames_list = []
     uniform_labels = []
@@ -59,22 +60,35 @@ def process_files(audio_files, labels, file_limit=None):
     if file_limit is not None:
         audio_files = audio_files[:file_limit]
         labels = labels[:file_limit]
+        #print("process_file: Audio Files: ", audio_files)
+        #print("process_file: Labels: ", labels)
 
     progress_bar = tqdm(total=len(audio_files), unit="file", ncols=80,
                         bar_format="{l_bar}{bar}| {n_fmt}/{total_fmt} files [{elapsed}<{remaining}]")
-    
+
+    #i = 0 # counter for debugign
     for file_path, label in zip(audio_files, labels):
+        
         audio, sr = load_audio_file(file_path)
         if audio is not None:
             features = extract_features(audio, sr)
+
             features_list.append(features)
             filenames_list.append(os.path.basename(file_path))
-
-            int_label = 1 if label == 'female' else 0
-            uniform_labels.append(int_label)  # Ensure labels are appended only when features are added
+            
+            uniform_labels.append(label)  # Ensure labels are appended only when features are added
+            
+            #if i < 10:
+                #print("filenames list ", filenames_list)
+               # print("labels: ", uniform_labels)
+                #print("features list: ", features_list)
+                
+            
+          
         else:
             print(f"Warning: Audio loading failed for {file_path}")  # Optionally handle or log the failed load
         progress_bar.update(1)
 
     progress_bar.close()
+
     return features_list, filenames_list, uniform_labels
