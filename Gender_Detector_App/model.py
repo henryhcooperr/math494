@@ -41,17 +41,13 @@ def train_random_forest(X, y, filenames):
 from sklearn.metrics import accuracy_score, precision_score, recall_score
 
 def evaluate_model(model, X_test, y_test, filenames_test):
-    predictions = model.predict(X_test)
+    
     
     # Ensure that y_test and predictions are of type int, as expected by precision and recall functions
-    #y_test = [int(y) for y in y_test]
-    predictions = [int(pred) for pred in predictions]
-    
-    # Output debugging information
-    print("Label types:", type(y_test[0]), type(predictions[0]))  # Debugging line
-    print("Actual labels:", y_test)  # Debugging line to check actual labels
-    print("Predictions:", predictions)  # Debugging line to check predictions
+    y_test = [1 if y == 'female' else 0 for y in y_test]
+    predictions = model.predict(X_test)
 
+    
     # Compute evaluation metrics
     accuracy = accuracy_score(y_test, predictions)
     precision = precision_score(y_test, predictions, average='macro')  # Changed to 'macro' for overall average
