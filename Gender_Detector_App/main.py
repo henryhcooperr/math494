@@ -3,6 +3,13 @@ import numpy as np
 from extract_audio_features import get_audio_files, process_files
 from model import train_decision_tree, evaluate_model, save_model
 from data_storage import save_features_to_file, load_features_from_file
+"""
+LABELS STORED AS INT
+FEATURES STORED AS FLOATS
+
+
+"""
+
 
 def print_data_balance(labels):
     male_count = sum(1 for label in labels if label == 'male')
@@ -27,7 +34,11 @@ def main():
         # Extract features for both training and testing
         male_train_files, male_train_labels, male_test_files, male_test_labels = get_audio_files(male_audio_directory)
         female_train_files, female_train_labels, female_test_files, female_test_labels = get_audio_files(female_audio_directory)
-            
+
+        print("Male Test Labels:", male_test_labels)
+        print("Female Test Labels:", female_test_labels)
+        print("Data Type of First Element in Male Test Labels:", type(male_test_labels[0]) if male_test_labels else "Empty List") 
+        
         print("Extracting Male Audio Features for Training:")
         male_train_features, male_filenames, male_train_labels = process_files(male_train_files, male_train_labels, file_limit)
         print("Extracting Female Audio Features for Training:")
@@ -41,6 +52,7 @@ def main():
         
 
         train_features = male_train_features + female_train_features
+        print(labels)
         labels = [1 if "female" in label else 0 for label in male_train_labels + female_train_labels]            
         filenames = male_filenames + female_filenames
 
@@ -66,7 +78,9 @@ def main():
         female_test_features, female_test_filenames, female_test_labels = process_files(female_test_files, female_test_labels, file_limit)
         
         test_features = male_test_features + female_test_features
-        test_labels = [1 if "female" in label else 0 for label in male_test_labels + female_test_labels]
+        test_labels = ["female" if label == 1 else "male" for label in male_test_labels + female_test_labels]
+
+
         test_filenames = male_test_filenames + female_test_filenames
 
 

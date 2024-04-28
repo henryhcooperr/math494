@@ -6,18 +6,16 @@ import warnings
 from sklearn.model_selection import train_test_split
 
 def get_audio_files(audio_directory, test_size=5):
-    """Retrieve audio files and their labels from the specified directory, excluding a random subset for testing."""
     audio_files = []
     labels = []
     for file in os.listdir(audio_directory):
         if file.endswith(".mp3"):
             audio_files.append(os.path.join(audio_directory, file))
-            label = os.path.basename(audio_directory).split("_")[0]  # Assumes directory name includes the label
+            # Correctly assign labels based on the filename prefix
+            label = 1 if file.startswith('f') else 0  # 1 for female, 0 for male
             labels.append(label)
-    
-    # Splitting data into training and testing
-    train_files, test_files, train_labels, test_labels = train_test_split(
-        audio_files, labels, test_size=test_size, random_state=42)
+
+    train_files, test_files, train_labels, test_labels = train_test_split(audio_files, labels, test_size=test_size, random_state=42)
     
     return train_files, train_labels, test_files, test_labels
 
@@ -47,18 +45,27 @@ def process_files(audio_files, labels, file_limit=None):
     """Process specified audio files to extract features along with their labels and filenames."""
     features_list = []
     filenames_list = []
+    uniform_labels = []
+
     if file_limit is not None:
         audio_files = audio_files[:file_limit]
         labels = labels[:file_limit]
 
     progress_bar = tqdm(total=len(audio_files), unit="file", ncols=80,
                         bar_format="{l_bar}{bar}| {n_fmt}/{total_fmt} files [{elapsed}<{remaining}]")
+    
     for file_path, label in zip(audio_files, labels):
         audio, sr = load_audio_file(file_path)
         if audio is not None:
             features = extract_features(audio, sr)
             features_list.append(features)
             filenames_list.append(os.path.basename(file_path))
+
+            int_label = 1 if label == 'female' else 0
+            uniform_labels.append(int_label)  # Ensure labels are appended only when features are added
+        else:
+            print(f"Warning: Audio loading failed for {file_path}")  # Optionally handle or log the failed load
         progress_bar.update(1)
+
     progress_bar.close()
-    return features_list, filenames_list, labels
+    return features_list, filenames_list, uniform_labels

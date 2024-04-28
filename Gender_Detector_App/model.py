@@ -38,26 +38,36 @@ def train_random_forest(X, y, filenames):
     evaluate_model(model, X_test, y_test, filenames_test)
     return model
 
+from sklearn.metrics import accuracy_score, precision_score, recall_score
+
 def evaluate_model(model, X_test, y_test, filenames_test):
-    """
-    Evaluates the trained model using the test set with filenames, providing a simplified classification report.
-    Returns the evaluation results as a string.
-    """
     predictions = model.predict(X_test)
+    
+    # Ensure that y_test and predictions are of type int, as expected by precision and recall functions
+    #y_test = [int(y) for y in y_test]
+    predictions = [int(pred) for pred in predictions]
+    
+    # Output debugging information
+    print("Label types:", type(y_test[0]), type(predictions[0]))  # Debugging line
+    print("Actual labels:", y_test)  # Debugging line to check actual labels
+    print("Predictions:", predictions)  # Debugging line to check predictions
+
+    # Compute evaluation metrics
     accuracy = accuracy_score(y_test, predictions)
-    precision = precision_score(y_test, predictions, average=None)  # Returns results for each class
-    recall = recall_score(y_test, predictions, average=None)  # Returns results for each class
+    precision = precision_score(y_test, predictions, average='macro')  # Changed to 'macro' for overall average
+    recall = recall_score(y_test, predictions, average='macro')  # Changed to 'macro' for overall average
 
-    results = f"Accuracy: {accuracy:.2f}\n"
-    results += f"Precision per class: {precision}\n"
-    results += f"Recall per class: {recall}\n\n"
+    # Print evaluation metrics
+    print("Accuracy:", accuracy)
+    print("Precision per class:", precision)
+    print("Recall per class:", recall)
 
+    # Print predictions against actuals for each file
     for filename, actual, predicted in zip(filenames_test, y_test, predictions):
         actual_label = 'Female' if actual == 1 else 'Male'
         predicted_label = 'Female' if predicted == 1 else 'Male'
-        results += f"File: {filename}, Actual: {actual_label}, Predicted: {predicted_label}\n"
+        print(f"File: {filename}, Actual: {actual_label}, Predicted: {predicted_label}")
 
-    return results
 def save_model(model, filename):
     """
     Saves the trained model to disk.
