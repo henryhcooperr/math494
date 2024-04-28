@@ -3,7 +3,9 @@ from sklearn.ensemble import RandomForestClassifier
 from sklearn.model_selection import train_test_split
 from sklearn.metrics import accuracy_score, precision_score, recall_score
 import joblib
+from function_tracker import count_function_calls
 
+@count_function_calls
 def train_decision_tree(X, y, filenames):
     """
     Trains a Decision Tree Classifier.
@@ -21,6 +23,7 @@ def train_decision_tree(X, y, filenames):
     evaluate_model(model, X_test, y_test, filenames_test) 
     return model
 
+@count_function_calls
 def train_random_forest(X, y, filenames):
     """
     Trains a Random Forest Classifier.
@@ -40,8 +43,9 @@ def train_random_forest(X, y, filenames):
 
 from sklearn.metrics import accuracy_score, precision_score, recall_score
 
+@count_function_calls
 def evaluate_model(model, X_test, y_test, filenames_test):
-    
+    print("Filenames Test:" + str(filenames_test))
     
     # Ensure that y_test and predictions are of type int, as expected by precision and recall functions
     y_test = [1 if y == 'female' else 0 for y in y_test]
@@ -60,16 +64,20 @@ def evaluate_model(model, X_test, y_test, filenames_test):
 
     # Print predictions against actuals for each file
     for filename, actual, predicted in zip(filenames_test, y_test, predictions):
+        print(actual)
+        print(predicted)
         actual_label = 'Female' if actual == 1 else 'Male'
         predicted_label = 'Female' if predicted == 1 else 'Male'
         print(f"File: {filename}, Actual: {actual_label}, Predicted: {predicted_label}")
 
+@count_function_calls
 def save_model(model, filename):
     """
     Saves the trained model to disk.
     """
     joblib.dump(model, filename)
 
+@count_function_calls
 def load_model(filename):
     """
     Loads a trained model from disk.

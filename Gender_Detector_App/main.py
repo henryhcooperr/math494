@@ -3,6 +3,8 @@ import numpy as np
 from extract_audio_features import get_audio_files, process_files
 from model import train_decision_tree, evaluate_model, save_model
 from data_storage import save_features_to_file, load_features_from_file
+from function_tracker import count_function_calls
+
 """
 LABELS STORED AS INT
 FEATURES STORED AS FLOATS
@@ -12,11 +14,11 @@ FEATURES STORED AS FLOATS
 
 
 def print_data_balance(labels):
+
     male_count = sum(1 for label in labels if label == 'male')
     female_count = sum(1 for label in labels if label == 'female')
-    print(f"Male samples: {male_count}")
-    print(f"Female samples: {female_count}")
 
+@count_function_calls
 def main():
     current_directory = os.path.dirname(os.path.abspath(__file__))
     male_audio_directory = os.path.join(current_directory, "male_mp3")
@@ -34,7 +36,8 @@ def main():
         # Extract features for both training and testing
         male_train_files, male_train_labels, male_test_files, male_test_labels = get_audio_files(male_audio_directory)
         female_train_files, female_train_labels, female_test_files, female_test_labels = get_audio_files(female_audio_directory)
-
+        print("path to female: " + str (female_audio_directory))
+        print("path to male audio directory: " + str (male_audio_directory))
         print("Male Test Labels:", male_test_labels)
         print("Female Test Labels:", female_test_labels)
         print("Data Type of First Element in Male Test Labels:", type(male_test_labels[0]) if male_test_labels else "Empty List") 
@@ -52,20 +55,23 @@ def main():
         
 
         train_features = male_train_features + female_train_features
-        print(labels)
-        labels = [1 if "female" in label else 0 for label in male_train_labels + female_train_labels]            
+        for i in range(10): print("male " + str(male_train_labels))
+        for i in range(10): print("female " + str(female_train_labels))
+        comb_train_labels = male_train_labels + female_train_labels
+        train_labels = ["female" if label == 1 else 0 for label in comb_train_labels ]            
         filenames = male_filenames + female_filenames
 
         # Combine testing data
         test_features = male_test_features + female_test_features
-        test_labels = [1 if "female" in label else 0 for label in male_test_labels + female_test_labels]
+        comb_test_labels = male_test_labels + female_test_labels
+        test_labels = ["female" if label == 1 else 0 for label in comb_test_labels ]            
         test_filenames = male_test_filenames + female_test_filenames
 
             
-        print_data_balance(labels)  # Print balance info for training data
+
         print("Feature extraction completed.")
 
-        save_features_to_file(features, labels, filenames, feature_file)
+        save_features_to_file(train_features, train_labels, filenames, feature_file)
 
         features, labels, filenames = load_features_from_file(feature_file)
     else:

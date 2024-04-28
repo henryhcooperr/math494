@@ -2,7 +2,9 @@ import os
 import numpy as np
 from model import train_decision_tree, evaluate_model, save_model
 import extract_audio_features
+from function_tracker import count_function_calls
 
+@count_function_calls
 def save_features_to_file(features, labels, filenames, file_path):
     """
     Save features, labels, and filenames to a file, ensuring labels are saved as integers.
@@ -13,6 +15,7 @@ def save_features_to_file(features, labels, filenames, file_path):
             f.write(f"{filename},{int(label)},{' '.join(map(str, feature))}\n")
 
 
+@count_function_calls
 def load_features_from_file(file_path):
     """
     Load features, labels, and filenames from a file.
