@@ -5,10 +5,14 @@ from model import train_decision_tree, evaluate_model, save_model, load_model
 from data_storage import save_features_to_file, load_features_from_file
 from function_tracker import count_function_calls
 from sklearn.model_selection import train_test_split
+from record_audio import record_sample
 
 """
 LABELS STORED AS INT
 FEATURES STORED AS FLOATS
+
+TO DO: FILE CREATION
+- OWN AUDIO EVALUATION
 
 
 """
@@ -38,7 +42,8 @@ def main():
         print("\nMenu:")
         print("1. Train decision tree model")
         print("2. Evaluate model")
-        print("3. Exit")
+        print("3. Record audio")
+        print("4. Exit")
         choice = input("Enter your choice (1-3): ")
 
         if choice == "1":
@@ -57,8 +62,16 @@ def main():
             else:
                 print("Insufficient test data available. Please check your dataset.")
         elif choice == "3":
+            print("recording audio...")
+
+            file_path = record_sample()
+            model = load_model("decision_tree_model.pkl")
+            
+
+        elif choice == "4":
             print("Exiting...")
             break
+        
         else:
             print("Invalid choice. Please try again.")
 

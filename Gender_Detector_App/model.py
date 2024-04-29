@@ -67,9 +67,7 @@ def evaluate_model(model, X_test, y_test, filenames_test):
     recall = recall_score(y_test, predictions, average='macro')
 
     # Print evaluation metrics
-    print("Accuracy:", accuracy)
-    print("Precision per class:", precision)
-    print("Recall per class:", recall)
+    
 
     # Print predictions against actual labels for each file
     for filename, actual, predicted in zip(filenames_test, y_test, predictions):
@@ -77,6 +75,9 @@ def evaluate_model(model, X_test, y_test, filenames_test):
         predicted_label = 'Female' if predicted == 1 else 'Male'
         print(f"File: {filename}, Actual: {actual_label}, Predicted: {predicted_label}")
 
+    print("Accuracy:", accuracy)
+    print("Precision per class:", precision)
+    print("Recall per class:", recall)
 
 @count_function_calls
 def save_model(model, filename):

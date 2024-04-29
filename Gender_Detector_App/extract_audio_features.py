@@ -39,6 +39,7 @@ def load_audio_file(file_path, sample_rate=None):
         print(f"Failed to load audio file: {e}")
     return None, None
 
+
 @count_function_calls
 def extract_features(audio, sr, n_mfcc=13):
     """Extract MFCC features from audio with the given sample rate and number of coefficients."""
