@@ -2,7 +2,7 @@ import sounddevice as sd
 from scipy.io.wavfile import write
 import os
 
-def record_sample(duration=2, sample_rate=44100, file_name="output.wav"):
+def record_sample(duration=5, sample_rate=44100, file_name="output.wav"):
     """
     Record audio from the microphone and save it directly to a WAV file.
    
