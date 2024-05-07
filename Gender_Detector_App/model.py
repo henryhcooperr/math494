@@ -8,87 +8,117 @@ from function_tracker import count_function_calls
 @count_function_calls
 def train_decision_tree(X, y, filenames):
     """
-    Trains a Decision Tree Classifier.
+    Train a Decision Tree Classifier.
+
     Args:
         X (numpy.ndarray): Feature array.
         y (numpy.ndarray): Label array.
         filenames (list): List of filenames corresponding to X and y.
+
     Returns:
-        DecisionTreeClassifier: Trained model.
+        DecisionTreeClassifier: Trained Decision Tree Classifier model.
     """
+    # Split data into train and test sets
     X_train, X_test, y_train, y_test, filenames_train, filenames_test = train_test_split(
         X, y, filenames, test_size=0.2, random_state=42)
+    
+    # Create and train the Decision Tree Classifier
     model = DecisionTreeClassifier(random_state=42)
     model.fit(X_train, y_train)
-    return model, X_test, y_test
+    
+    return model
 
 @count_function_calls
 def train_random_forest(X, y, filenames):
     """
-    Trains a Random Forest Classifier.
+    Train a Random Forest Classifier.
+
     Args:
         X (numpy.ndarray): Feature array.
         y (numpy.ndarray): Label array.
         filenames (list): List of filenames corresponding to X and y.
+
     Returns:
-        RandomForestClassifier: Trained model.
+        RandomForestClassifier: Trained Random Forest Classifier model.
     """
+    # Split data into train and test sets
     X_train, X_test, y_train, y_test, filenames_train, filenames_test = train_test_split(
         X, y, filenames, test_size=0.2, random_state=42)
+    
+    # Create and train the Random Forest Classifier
     model = RandomForestClassifier(n_estimators=100, random_state=42)
     model.fit(X_train, y_train)
-    evaluate_model(model, X_test, y_test, filenames_test)
+    
     return model
 
-from sklearn.metrics import accuracy_score, precision_score, recall_score
-
 @count_function_calls
+def evaluate_model(model, X_test, y_test, filenames_test, print_results=True):
+    """
+    Evaluate the given model using test data.
 
-def evaluate_model(model, X_test, y_test, filenames_test):
-    print("Evaluating model...")
+    Args:
+        model (model): Trained model to evaluate.
+        X_test (numpy.ndarray): Test feature array.
+        y_test (numpy.ndarray): Test label array.
+        filenames_test (list): List of filenames corresponding to X_test and y_test.
+        print_results (bool): Flag to control the printing of the evaluation results. Default is True.
 
-    # Print the filenames to check what is being tested
-    print("Filenames for Testing:", filenames_test)
+    Returns:
+        tuple: A tuple containing accuracy, precision, and recall of the model.
+    """
+    if print_results:
+        print("Evaluating model...")
     
-    # Debug: Output the actual labels before any changes for tracing issues
-    print("Original Y Test:", y_test)
-
-    # Check if y_test needs conversion from labels ('female', 'male') to integers (1, 0)
-    # If y_test is already integer, remove the conversion; otherwise, uncomment the next line
-    # y_test = [1 if y == 'female' else 0 for y in y_test]
-
-    # Predict using the model
-    print("model", model)
-    predictions = model[0].predict(X_test)
-
-    # Compute evaluation metrics
+    # Make predictions using the trained model
+    predictions = model.predict(X_test)
+    
+    # Calculate evaluation metrics
     accuracy = accuracy_score(y_test, predictions)
-    precision = precision_score(y_test, predictions, average='macro')  # 'macro' gives unweighted mean per class
+    precision = precision_score(y_test, predictions, average='macro')
     recall = recall_score(y_test, predictions, average='macro')
 
-    # Print evaluation metrics
-    
+    if print_results:
+        print("Accuracy:", accuracy)
+        print("Precision per class:", precision)
+        print("Recall per class:", recall)
+        
+        # Print individual file predictions
+        for filename, actual, predicted in zip(filenames_test, y_test, predictions):
+            actual_label = 'Female' if actual == 1 else 'Male'
+            predicted_label = 'Female' if predicted == 1 else 'Male'
+            print(f"File: {filename}, Actual: {actual_label}, Predicted: {predicted_label}")
 
-    # Print predictions against actual labels for each file
-    for filename, actual, predicted in zip(filenames_test, y_test, predictions):
-        actual_label = 'Female' if actual == 1 else 'Male'
-        predicted_label = 'Female' if predicted == 1 else 'Male'
-        print(f"File: {filename}, Actual: {actual_label}, Predicted: {predicted_label}")
-
-    print("Accuracy:", accuracy)
-    print("Precision per class:", precision)
-    print("Recall per class:", recall)
+    return accuracy, precision, recall
 
 @count_function_calls
 def save_model(model, filename):
     """
-    Saves the trained model to disk.
+    Save the trained model to disk.
+
+    Args:
+        model (model): Trained model to save.
+        filename (str): Filename to save the model.
     """
     joblib.dump(model, filename)
 
 @count_function_calls
 def load_model(filename):
     """
-    Loads a trained model from disk.
+    Load a trained model from disk.
+
+    Args:
+        filename (str): Filename of the saved model.
+
+    Returns:
+        model: Loaded trained model.
     """
     return joblib.load(filename)
+
+def compare_model_accuracies(features_test, labels_test, filenames_test):
+    print("Comparing model accuracies...")
+    dt_model = load_model("decision_tree_model.pkl")
+    rf_model = load_model("random_forest_model.pkl")
+    dt_accuracy, dt_precision, dt_recall = evaluate_model(dt_model, features_test, labels_test, filenames_test, print_results=False)
+    rf_accuracy, rf_precision, rf_recall = evaluate_model(rf_model, features_test, labels_test, filenames_test, print_results=False)
+    print(f"Decision Tree - Accuracy: {dt_accuracy}, Precision: {dt_precision}, Recall: {dt_recall}")
+    print(f"Random Forest - Accuracy: {rf_accuracy}, Precision: {rf_precision}, Recall: {rf_recall}")

@@ -1,6 +1,8 @@
 import sounddevice as sd
 from scipy.io.wavfile import write
 import os
+from pydub import AudioSegment
+
 
 def record_sample(duration=5, sample_rate=44100, file_name="output.wav"):
     """
@@ -30,3 +32,9 @@ def record_sample(duration=5, sample_rate=44100, file_name="output.wav"):
     print(f"Audio saved to {full_path}")
     
     return full_path
+
+def convert_audio_to_wav(input_path):
+    audio = AudioSegment.from_file(input_path)
+    output_path = input_path.replace('.mp3', '.wav')  # Change extension to .wav
+    audio.export(output_path, format='wav')
+    return output_path
