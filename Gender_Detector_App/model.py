@@ -4,6 +4,11 @@ from sklearn.model_selection import train_test_split
 from sklearn.metrics import accuracy_score, precision_score, recall_score
 import joblib
 from function_tracker import count_function_calls
+from sklearn.tree import export_graphviz
+import pydotplus
+from IPython.display import Image, display
+
+
 
 @count_function_calls
 def train_decision_tree(X, y, filenames):
@@ -122,3 +127,18 @@ def compare_model_accuracies(features_test, labels_test, filenames_test):
     rf_accuracy, rf_precision, rf_recall = evaluate_model(rf_model, features_test, labels_test, filenames_test, print_results=False)
     print(f"Decision Tree - Accuracy: {dt_accuracy}, Precision: {dt_precision}, Recall: {dt_recall}")
     print(f"Random Forest - Accuracy: {rf_accuracy}, Precision: {rf_precision}, Recall: {rf_recall}")
+
+def visualize_decision_tree(model, feature_names, class_names):
+    dot_data = export_graphviz(model, out_file=None,
+                               feature_names=feature_names,
+                               class_names=class_names,
+                               filled=True, rounded=True,
+                               special_characters=True)
+    graph = pydotplus.graph_from_dot_data(dot_data)
+    # Setting graph size (width, height in inches)
+    graph.set_size('"16,16!"')
+    graph.set_dpi(2000)
+    graph.write_png('decision_tree.png')
+    display(Image(graph.create_png()))
+
+
