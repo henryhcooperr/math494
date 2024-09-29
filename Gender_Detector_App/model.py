@@ -51,7 +51,7 @@ def train_random_forest(X, y, filenames):
         X, y, filenames, test_size=0.2, random_state=42)
     
     # Create and train the Random Forest Classifier
-    model = RandomForestClassifier(n_estimators=100, random_state=42)
+    model = RandomForestClassifier(n_estimators=1000, random_state=42)
     model.fit(X_train, y_train)
     
     return model
